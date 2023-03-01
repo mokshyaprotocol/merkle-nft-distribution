@@ -83,7 +83,6 @@ module mokshya::merkle_nft_distributor{
         let resource_signer_from_cap = account::create_signer_with_capability(&resource_data.resource_cap);
         let distributor_details = borrow_global<DistributionDetails>(resource_account);
         let claim_details = borrow_global_mut<ClaimDistribution>(resource_account);
-        // assert!(!table::contains(&claim_details.claimers, claimer_addr),AlREADY_CLAIMED);
         assert!(claim_details.paused == false, PAUSED);
         let leafvec = bcs::to_bytes(&claimer_addr);
         vector::append(&mut leafvec,bcs::to_bytes(&claim_limit));
@@ -105,7 +104,7 @@ module mokshya::merkle_nft_distributor{
             }
         );
     }
-    public entry fun withdraw_funds<CoinType>(
+    public entry fun withdraw_tokens(
         distributor: &signer,
         resource_account:address,
         collection_name: String,
@@ -137,10 +136,6 @@ module mokshya::merkle_nft_distributor{
         assert!(resource_data.source == signer::address_of(distributor), INVALID_SIGNER);
         let claim_data = borrow_global_mut<ClaimDistribution>(resource_account);
         claim_data.paused = false;
-    }
-    fun coin_address<CoinType>(): address {
-        let type_info = type_info::type_of<CoinType>();
-        type_info::account_address(&type_info)
     }
     #[test_only] 
     use aptos_token::token::{create_collection,create_token_script};
